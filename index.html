@@ -249,8 +249,15 @@ header p {
 
 
 <script>
+const SUPABASE_URL = "ТВОЙ_API_URL";
+const SUPABASE_KEY = "ТВОЙ_PUBLISHABLE_KEY";
 
-const anime = [
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+    const anime = [
 
     {
 
