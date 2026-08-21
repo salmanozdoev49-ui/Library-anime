@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Anime Library</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #0b0b0f;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    padding: 25px 18px 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    color: #999;
+    margin-top: 8px;
+}
+
+.search {
+    padding: 10px 18px;
+}
+
+.search input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    background: #17171d;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+    padding: 10px 18px 20px;
+    overflow-x: auto;
+}
+
+.filters button {
+    white-space: nowrap;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    background: #191920;
+    color: white;
+}
+
+.library {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 0 18px 30px;
+}
+
+.card {
+    background: #15151b;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.card-info {
+    padding: 10px;
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.card-meta {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.rating {
+    color: #ffd54a;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #777;
+    padding: 50px 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎌 Anime Library</h1>
+    <p>Моя личная библиотека аниме</p>
+</header>
+
+<div class="search">
+    <input
+        type="text"
+        id="search"
+        placeholder="🔎 Найти аниме..."
+        oninput="searchAnime()"
+    >
+</div>
+
+<div class="filters">
+    <button onclick="showAll()">Все</button>
+    <button onclick="showWatched()">Просмотрено</button>
+    <button onclick="showFavorites()">⭐ Избранное</button>
+</div>
+
+<div class="library" id="library"></div>
+
+<script>
+
+const anime = [
+    {
+        title: "Тестовое аниме",
+        year: 2024,
+        episodes: 12,
+        rating: 9,
+        dub: "AniLibria",
+        status: "Просмотрено",
+        continuation: "Анонсировано",
+        poster: "https://via.placeholder.com/400x600/15151b/ffffff?text=Anime",
+    }
+];
+
+const library = document.getElementById("library");
+
+function render(list) {
+
+    library.innerHTML = "";
+
+    if (list.length === 0) {
+        library.innerHTML =
+            '<div class="empty">Аниме не найдено</div>';
+        return;
+    }
+
+    list.forEach(item => {
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="${item.poster}" alt="${item.title}">
+
+            <div class="card-info">
+
+                <div class="card-title">
+                    ${item.title}
+                </div>
+
+                <div class="card-meta">
+                    ${item.year} • ${item.episodes} серий
+                </div>
+
+                <div class="card-meta rating">
+                    ⭐ ${item.rating}/10
+                </div>
+
+                <div class="card-meta">
+                    🎙️ ${item.dub}
+                </div>
+
+            </div>
+        `;
+
+        library.appendChild(card);
+    });
+}
+
+function searchAnime() {
+
+    const query =
+        document.getElementById("search")
+        .value
+        .toLowerCase();
+
+    const result = anime.filter(item =>
+        item.title.toLowerCase().includes(query)
+    );
+
+    render(result);
+}
+
+function showAll() {
+    render(anime);
+}
+
+function showWatched() {
+
+    render(
+        anime.filter(item =>
+            item.status === "Просмотрено"
+        )
+    );
+}
+
+function showFavorites() {
+    render(anime);
+}
+
+render(anime);
+
+</script>
+
+</body>
+  </html>
