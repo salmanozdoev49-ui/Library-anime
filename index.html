@@ -7,14 +7,15 @@
 <title>Anime Library</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background: #0b0b0f;
-    color: #ffffff;
+    background: #09090d;
+    color: #fff;
     font-family: Arial, sans-serif;
 }
 
@@ -30,7 +31,7 @@ header h1 {
 
 header p {
     color: #999;
-    margin-top: 8px;
+    margin: 8px 0 0;
 }
 
 .search {
@@ -41,7 +42,7 @@ header p {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    border: 1px solid #333;
+    border: 1px solid #303038;
     background: #17171d;
     color: white;
     font-size: 16px;
@@ -58,7 +59,7 @@ header p {
 .filters button {
     white-space: nowrap;
     padding: 10px 15px;
-    border: none;
+    border: 0;
     border-radius: 10px;
     background: #191920;
     color: white;
@@ -98,80 +99,226 @@ header p {
 .card-meta {
     font-size: 13px;
     color: #aaa;
+    margin-top: 4px;
 }
 
 .rating {
     color: #ffd54a;
 }
 
-.empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: #777;
-    padding: 50px 20px;
+/* КАРТОЧКА */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    display: none;
+    overflow-y: auto;
+    z-index: 100;
 }
+
+.modal-content {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #101015;
+    padding-bottom: 40px;
+}
+
+.close {
+    position: fixed;
+    right: 18px;
+    top: 15px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0,0,0,.7);
+    color: white;
+    font-size: 25px;
+    z-index: 101;
+}
+
+.modal-poster {
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+}
+
+.details {
+    padding: 20px;
+}
+
+.details h2 {
+    margin-top: 0;
+    font-size: 26px;
+}
+
+.info {
+    display: grid;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.info div {
+    background: #191920;
+    padding: 11px;
+    border-radius: 9px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 25px;
+}
+
+.description,
+.comment {
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.continuation {
+    color: #ffd54a;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
+
     <h1>🎌 Anime Library</h1>
+
     <p>Моя личная библиотека аниме</p>
+
 </header>
 
 <div class="search">
+
     <input
-        type="text"
         id="search"
+        type="text"
         placeholder="🔎 Найти аниме..."
         oninput="searchAnime()"
     >
+
 </div>
 
 <div class="filters">
+
     <button onclick="showAll()">Все</button>
-    <button onclick="showWatched()">Просмотрено</button>
-    <button onclick="showFavorites()">⭐ Избранное</button>
+
+    <button onclick="showWatched()">
+        👀 Просмотрено
+    </button>
+
+    <button onclick="showFavorites()">
+        ⭐ Избранное
+    </button>
+
 </div>
 
-<div class="library" id="library"></div>
+<div
+    class="library"
+    id="library">
+</div>
+
+
+<!-- ОКНО АНИМЕ -->
+
+<div
+    class="modal"
+    id="modal">
+
+    <button
+        class="close"
+        onclick="closeAnime()">
+
+        ×
+
+    </button>
+
+    <div
+        class="modal-content"
+        id="modalContent">
+    </div>
+
+</div>
+
 
 <script>
 
 const anime = [
+
     {
+
         title: "Тестовое аниме",
+
         year: 2024,
+
         episodes: 12,
+
         rating: 9,
+
         dub: "AniLibria",
+
         status: "Просмотрено",
+
         continuation: "Анонсировано",
-        poster: "https://via.placeholder.com/400x600/15151b/ffffff?text=Anime",
+
+        genres: "Экшен, Фэнтези, Приключения",
+
+        description:
+        "Это тестовая карточка твоей будущей библиотеки аниме. Здесь будет находиться описание каждого тайтла.",
+
+        comment:
+        "Пока это тестовое описание. Позже здесь будут твои личные впечатления.",
+
+        poster:
+        "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime"
+
     }
+
 ];
 
-const library = document.getElementById("library");
+
+const library =
+    document.getElementById("library");
+
 
 function render(list) {
 
     library.innerHTML = "";
 
     if (list.length === 0) {
+
         library.innerHTML =
-            '<div class="empty">Аниме не найдено</div>';
+        '<div style="grid-column:1/-1;text-align:center;color:#777;padding:50px">Аниме не найдено</div>';
+
         return;
+
     }
 
-    list.forEach(item => {
 
-        const card = document.createElement("div");
+    list.forEach((item, index) => {
+
+        const card =
+        document.createElement("div");
 
         card.className = "card";
 
+        card.onclick = () =>
+        openAnime(item);
+
+
         card.innerHTML = `
-            <img src="${item.poster}" alt="${item.title}">
+
+            <img
+                src="${item.poster}"
+                alt="${item.title}"
+            >
 
             <div class="card-info">
 
@@ -191,30 +338,151 @@ function render(list) {
                     🎙️ ${item.dub}
                 </div>
 
+                <div class="card-meta">
+                    🔮 ${item.continuation}
+                </div>
+
             </div>
+
         `;
 
         library.appendChild(card);
+
     });
+
 }
+
+
+function openAnime(item) {
+
+    const modal =
+    document.getElementById("modal");
+
+    const content =
+    document.getElementById("modalContent");
+
+
+    content.innerHTML = `
+
+        <img
+            class="modal-poster"
+            src="${item.poster}"
+        >
+
+        <div class="details">
+
+            <h2>
+                ${item.title}
+            </h2>
+
+
+            <div class="info">
+
+                <div>
+                    📅 Год: ${item.year}
+                </div>
+
+                <div>
+                    📺 Серий: ${item.episodes}
+                </div>
+
+                <div>
+                    ⭐ Моя оценка:
+                    ${item.rating}/10
+                </div>
+
+                <div>
+                    🎙️ Озвучка:
+                    ${item.dub}
+                </div>
+
+                <div>
+                    👀 Статус:
+                    ${item.status}
+                </div>
+
+                <div class="continuation">
+                    🔮 Продолжение:
+                    ${item.continuation}
+                </div>
+
+                <div>
+                    🎭 Жанры:
+                    ${item.genres}
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                📝 Описание
+            </div>
+
+            <div class="description">
+                ${item.description}
+            </div>
+
+
+            <div class="section-title">
+                💭 Моё мнение
+            </div>
+
+            <div class="comment">
+                ${item.comment}
+            </div>
+
+        </div>
+
+    `;
+
+
+    modal.style.display = "block";
+
+    document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeAnime() {
+
+    document.getElementById("modal")
+    .style.display = "none";
+
+    document.body.style.overflow =
+    "auto";
+
+}
+
 
 function searchAnime() {
 
     const query =
-        document.getElementById("search")
-        .value
-        .toLowerCase();
+    document
+    .getElementById("search")
+    .value
+    .toLowerCase();
 
-    const result = anime.filter(item =>
-        item.title.toLowerCase().includes(query)
+
+    const result =
+    anime.filter(item =>
+        item.title
+        .toLowerCase()
+        .includes(query)
     );
 
+
     render(result);
+
 }
 
+
 function showAll() {
+
     render(anime);
+
 }
+
 
 function showWatched() {
 
@@ -223,15 +491,20 @@ function showWatched() {
             item.status === "Просмотрено"
         )
     );
+
 }
 
+
 function showFavorites() {
+
     render(anime);
+
 }
+
 
 render(anime);
 
 </script>
 
 </body>
-  </html>
+</html>
