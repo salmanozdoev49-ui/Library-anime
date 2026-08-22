@@ -7,7 +7,6 @@
 <title>Anime Library</title>
 
 <style>
-
 * {
     box-sizing: border-box;
 }
@@ -106,8 +105,6 @@ header p {
     color: #ffd54a;
 }
 
-/* КАРТОЧКА */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -182,33 +179,43 @@ header p {
     color: #ffd54a;
 }
 
+.loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #888;
+    padding: 50px 10px;
+}
+
+.error {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #ff7777;
+    padding: 50px 10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-
     <h1>🎌 Anime Library</h1>
-
     <p>Моя личная библиотека аниме</p>
-
 </header>
 
 <div class="search">
-
     <input
         id="search"
         type="text"
         placeholder="🔎 Найти аниме..."
         oninput="searchAnime()"
     >
-
 </div>
 
 <div class="filters">
 
-    <button onclick="showAll()">Все</button>
+    <button onclick="showAll()">
+        Все
+    </button>
 
     <button onclick="showWatched()">
         👀 Просмотрено
@@ -225,9 +232,6 @@ header p {
     id="library">
 </div>
 
-
-<!-- ОКНО АНИМЕ -->
-
 <div
     class="modal"
     id="modal">
@@ -235,9 +239,7 @@ header p {
     <button
         class="close"
         onclick="closeAnime()">
-
         ×
-
     </button>
 
     <div
@@ -251,104 +253,140 @@ header p {
 
 <script>
 
-const SUPABASE_URL = "https://hvmvgrkoazojrpmtbnzj.supabase.co"
-const SUPABASE_KEY = "sb_publishable_Jl93cw1rKXPSrzsoRx3mNw_euPMZEvE"
+/* ==============================
+   SUPABASE
+   ============================== */
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const SUPABASE_URL = "https://hvmvgrkoazojrpmtbnzj.supabase.co";
 
-const anime = [
+const SUPABASE_KEY = "sb_publishable_Jl93cw1rKXPSrzsoRx3mNw_euPMZEvE";
 
-    {
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
-        title: "Тестовое аниме",
 
-        year: 2024,
+/* ==============================
+   ДАННЫЕ
+   ============================== */
 
-        episodes: 12,
+let anime = [];
 
-        rating: 9,
+let currentList = [];
 
-        dub: "AniLibria",
 
-        status: "Просмотрено",
-
-        continuation: "Анонсировано",
-
-        genres: "Экшен, Фэнтези, Приключения",
-
-        description:
-        "Это тестовая карточка твоей будущей библиотеки аниме. Здесь будет находиться описание каждого тайтла.",
-
-        comment:
-        "Пока это тестовое описание. Позже здесь будут твои личные впечатления.",
-
-        poster:
-        "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime"
-
-    }
-
-];
-
+/* ==============================
+   ЭЛЕМЕНТЫ
+   ============================== */
 
 const library =
     document.getElementById("library");
 
 
+/* ==============================
+   ЗАГРУЗКА АНИМЕ ИЗ SUPABASE
+   ============================== */
+
+async function loadAnime() {
+
+    library.innerHTML =
+        '<div class="loading">⏳ Загружаю библиотеку...</div>';
+
+    const { data, error } =
+        await supabaseClient
+        .from("anime")
+        .select("*")
+        .order("created_at", {
+            ascending: false
+        });
+
+    if (error) {
+
+        console.error(error);
+
+        library.innerHTML =
+            '<div class="error">❌ Не удалось загрузить библиотеку.<br><br>' +
+            error.message +
+            '</div>';
+
+        return;
+    }
+
+    anime = data || [];
+
+    currentList = anime;
+
+    render(anime);
+}
+
+
+/* ==============================
+   ОТРИСОВКА
+   ============================== */
+
 function render(list) {
 
     library.innerHTML = "";
 
+    currentList = list;
+
     if (list.length === 0) {
 
         library.innerHTML =
-        '<div style="grid-column:1/-1;text-align:center;color:#777;padding:50px">Аниме не найдено</div>';
+            '<div class="loading">' +
+            'Аниме не найдено' +
+            '</div>';
 
         return;
-
     }
 
 
-    list.forEach((item, index) => {
+    list.forEach(item => {
 
         const card =
-        document.createElement("div");
+            document.createElement("div");
 
         card.className = "card";
 
         card.onclick = () =>
-        openAnime(item);
+            openAnime(item);
+
+
+        const poster =
+            item.poster ||
+            "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime";
 
 
         card.innerHTML = `
 
             <img
-                src="${item.poster}"
+                src="${poster}"
                 alt="${item.title}"
             >
 
             <div class="card-info">
 
                 <div class="card-title">
-                    ${item.title}
+                    ${item.title || "Без названия"}
                 </div>
 
                 <div class="card-meta">
-                    ${item.year} • ${item.episodes} серий
+                    ${item.year || "—"} •
+                    ${item.episodes || "—"} серий
                 </div>
 
                 <div class="card-meta rating">
-                    ⭐ ${item.rating}/10
+                    ⭐ ${item.rating || "—"}/10
                 </div>
 
                 <div class="card-meta">
-                    🎙️ ${item.dub}
+                    🎙️ ${item.dub || "—"}
                 </div>
 
                 <div class="card-meta">
-                    🔮 ${item.continuation}
+                    🔮 ${item.continuation || "—"}
                 </div>
 
             </div>
@@ -358,66 +396,77 @@ function render(list) {
         library.appendChild(card);
 
     });
-
 }
 
+
+/* ==============================
+   ОТКРЫТИЕ АНИМЕ
+   ============================== */
 
 function openAnime(item) {
 
     const modal =
-    document.getElementById("modal");
+        document.getElementById("modal");
 
     const content =
-    document.getElementById("modalContent");
+        document.getElementById("modalContent");
+
+
+    const poster =
+        item.poster ||
+        "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime";
 
 
     content.innerHTML = `
 
         <img
             class="modal-poster"
-            src="${item.poster}"
+            src="${poster}"
+            alt="${item.title}"
         >
 
         <div class="details">
 
             <h2>
-                ${item.title}
+                ${item.title || "Без названия"}
             </h2>
 
 
             <div class="info">
 
                 <div>
-                    📅 Год: ${item.year}
+                    📅 Год:
+                    ${item.year || "—"}
                 </div>
 
                 <div>
-                    📺 Серий: ${item.episodes}
+                    📺 Серий:
+                    ${item.episodes || "—"}
                 </div>
 
                 <div>
                     ⭐ Моя оценка:
-                    ${item.rating}/10
+                    ${item.rating || "—"}/10
                 </div>
 
                 <div>
                     🎙️ Озвучка:
-                    ${item.dub}
+                    ${item.dub || "—"}
                 </div>
 
                 <div>
                     👀 Статус:
-                    ${item.status}
+                    ${item.status || "—"}
                 </div>
 
                 <div class="continuation">
                     🔮 Продолжение:
-                    ${item.continuation}
+                    ${item.continuation || "—"}
                 </div>
 
                 <div>
                     🎭 Жанры:
-                    ${item.genres}
+                    ${item.genres || "—"}
                 </div>
 
             </div>
@@ -428,7 +477,7 @@ function openAnime(item) {
             </div>
 
             <div class="description">
-                ${item.description}
+                ${item.description || "Описание отсутствует."}
             </div>
 
 
@@ -437,7 +486,7 @@ function openAnime(item) {
             </div>
 
             <div class="comment">
-                ${item.comment}
+                ${item.comment || "Комментарий отсутствует."}
             </div>
 
         </div>
@@ -448,48 +497,68 @@ function openAnime(item) {
     modal.style.display = "block";
 
     document.body.style.overflow =
-    "hidden";
-
+        "hidden";
 }
 
+
+/* ==============================
+   ЗАКРЫТИЕ
+   ============================== */
 
 function closeAnime() {
 
     document.getElementById("modal")
-    .style.display = "none";
+        .style.display = "none";
 
     document.body.style.overflow =
-    "auto";
-
+        "auto";
 }
 
+
+/* ==============================
+   ПОИСК
+   ============================== */
 
 function searchAnime() {
 
     const query =
-    document
-    .getElementById("search")
-    .value
-    .toLowerCase();
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    if (!query) {
+
+        render(anime);
+
+        return;
+    }
 
 
     const result =
-    anime.filter(item =>
-        item.title
-        .toLowerCase()
-        .includes(query)
-    );
+        anime.filter(item => {
+
+            const title =
+                (item.title || "")
+                .toLowerCase();
+
+            return title.includes(query);
+        });
 
 
     render(result);
-
 }
 
+
+/* ==============================
+   ФИЛЬТРЫ
+   ============================== */
 
 function showAll() {
 
     render(anime);
-
 }
 
 
@@ -500,21 +569,28 @@ function showWatched() {
             item.status === "Просмотрено"
         )
     );
-
 }
 
 
 function showFavorites() {
 
-    render(anime);
+    /*
+       Пока избранное не настроено.
+       Поэтому временно показываем
+       всю библиотеку.
+    */
 
+    render(anime);
 }
 
 
-render(anime);
+/* ==============================
+   ЗАПУСК
+   ============================== */
+
+loadAnime();
 
 </script>
 
 </body>
-</html>    
-
+</html>
