@@ -34,11 +34,6 @@ header p {
     margin: 8px 0 0;
 }
 
-
-/* ==============================
-   АВТОРИЗАЦИЯ
-   ============================== */
-
 .auth-panel {
     padding: 0 18px 12px;
     text-align: center;
@@ -75,11 +70,6 @@ header p {
     background: #ffe27a;
 }
 
-
-/* ==============================
-   ПОИСК
-   ============================== */
-
 .search {
     padding: 10px 18px;
 }
@@ -94,11 +84,6 @@ header p {
     font-size: 16px;
     outline: none;
 }
-
-
-/* ==============================
-   ФИЛЬТРЫ
-   ============================== */
 
 .filters {
     display: flex;
@@ -116,11 +101,6 @@ header p {
     color: white;
     cursor: pointer;
 }
-
-
-/* ==============================
-   БИБЛИОТЕКА
-   ============================== */
 
 .library {
     display: grid;
@@ -163,11 +143,6 @@ header p {
     color: #ffd54a;
 }
 
-
-/* ==============================
-   ОБЩЕЕ ОКНО
-   ============================== */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -199,11 +174,6 @@ header p {
     z-index: 101;
     cursor: pointer;
 }
-
-
-/* ==============================
-   КАРТОЧКА АНИМЕ
-   ============================== */
 
 .modal-poster {
     width: 100%;
@@ -248,11 +218,6 @@ header p {
     color: #ffd54a;
 }
 
-
-/* ==============================
-   ЗАГРУЗКА / ОШИБКА
-   ============================== */
-
 .loading {
     grid-column: 1 / -1;
     text-align: center;
@@ -266,11 +231,6 @@ header p {
     color: #ff7777;
     padding: 50px 10px;
 }
-
-
-/* ==============================
-   ФОРМА
-   ============================== */
 
 .form-box {
     max-width: 600px;
@@ -342,11 +302,6 @@ header p {
     color: #aaa;
 }
 
-
-/* ==============================
-   ОКНО ВХОДА
-   ============================== */
-
 .login-box {
     max-width: 400px;
     margin: 80px auto;
@@ -402,34 +357,46 @@ header p {
     line-height: 1.4;
 }
 
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.edit-button,
+.delete-button {
+    flex: 1;
+    padding: 13px;
+    border: 0;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.edit-button {
+    background: #ffd54a;
+    color: #111;
+}
+
+.delete-button {
+    background: #d93636;
+    color: white;
+}
+
 </style>
 </head>
 
 <body>
 
-
 <header>
-
     <h1>🎌 Anime Library</h1>
-
     <p>Моя личная библиотека аниме</p>
-
 </header>
-
-
-<!-- ==============================
-     ПАНЕЛЬ АККАУНТА
-     ============================== -->
 
 <div
     class="auth-panel"
     id="authPanel">
 </div>
-
-
-<!-- ==============================
-     ПОИСК
-     ============================== -->
 
 <div class="search">
 
@@ -442,11 +409,6 @@ header p {
 
 </div>
 
-
-<!-- ==============================
-     ФИЛЬТРЫ
-     ============================== -->
-
 <div class="filters">
 
     <button onclick="showAll()">
@@ -457,16 +419,7 @@ header p {
         👀 Просмотрено
     </button>
 
-    <button onclick="showFavorites()">
-        ⭐ Избранное
-    </button>
-
 </div>
-
-
-<!-- ==============================
-     БИБЛИОТЕКА
-     ============================== -->
 
 <div
     class="library"
@@ -474,9 +427,7 @@ header p {
 </div>
 
 
-<!-- ==============================
-     ОКНО АНИМЕ
-     ============================== -->
+<!-- ОКНО АНИМЕ -->
 
 <div
     class="modal"
@@ -496,9 +447,7 @@ header p {
 </div>
 
 
-<!-- ==============================
-     ОКНО ВХОДА
-     ============================== -->
+<!-- ОКНО ВХОДА -->
 
 <div
     class="modal"
@@ -544,9 +493,7 @@ header p {
 </div>
 
 
-<!-- ==============================
-     ОКНО ДОБАВЛЕНИЯ
-     ============================== -->
+<!-- ОКНО ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ -->
 
 <div
     class="modal"
@@ -562,7 +509,9 @@ header p {
 
         <div class="form-box">
 
-            <h2>➕ Добавить аниме</h2>
+            <h2 id="formTitle">
+                ➕ Добавить аниме
+            </h2>
 
 
             <label class="form-label">
@@ -723,7 +672,8 @@ header p {
 
                 <button
                     class="form-save"
-                    onclick="addAnime()">
+                    id="formSaveButton"
+                    onclick="saveAnime()">
                     💾 Сохранить
                 </button>
 
@@ -742,14 +692,9 @@ header p {
 </div>
 
 
-<!-- ==============================
-     SUPABASE
-     ============================== -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-
 
 /* ==============================
    SUPABASE
@@ -758,11 +703,8 @@ header p {
 const SUPABASE_URL =
     "https://hvmvgrkoazojrpmtbnzj.supabase.co";
 
-
 const SUPABASE_KEY =
     "sb_publishable_Jl93cw1rKXPSrzsoRx3mNw_euPMZEvE";
-
-
 
 const supabaseClient =
     supabase.createClient(
@@ -779,6 +721,8 @@ let anime = [];
 
 let currentList = [];
 
+let editingAnimeId = null;
+
 
 /* ==============================
    ЭЛЕМЕНТЫ
@@ -789,14 +733,13 @@ const library =
 
 
 /* ==============================
-   ЗАГРУЗКА АНИМЕ
+   ЗАГРУЗКА
    ============================== */
 
 async function loadAnime() {
 
     library.innerHTML =
         '<div class="loading">⏳ Загружаю библиотеку...</div>';
-
 
     const { data, error } =
         await supabaseClient
@@ -805,7 +748,6 @@ async function loadAnime() {
         .order("created_at", {
             ascending: false
         });
-
 
     if (error) {
 
@@ -821,12 +763,31 @@ async function loadAnime() {
         return;
     }
 
-
     anime = data || [];
 
     currentList = anime;
 
     render(anime);
+}
+
+
+/* ==============================
+   ПРОВЕРКА АДМИНА
+   ============================== */
+
+async function isAdmin() {
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+    if (!user) {
+        return false;
+    }
+
+    return user.id ===
+        "e285b592-7765-48fd-a273-bae724c96ead";
 }
 
 
@@ -840,7 +801,6 @@ function render(list) {
 
     currentList = list;
 
-
     if (list.length === 0) {
 
         library.innerHTML =
@@ -851,7 +811,6 @@ function render(list) {
         return;
     }
 
-
     list.forEach(item => {
 
         const card =
@@ -859,15 +818,12 @@ function render(list) {
 
         card.className = "card";
 
-
         card.onclick = () =>
             openAnime(item);
-
 
         const poster =
             item.poster ||
             "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime";
-
 
         card.innerHTML = `
 
@@ -888,7 +844,7 @@ function render(list) {
                 </div>
 
                 <div class="card-meta rating">
-                    ⭐ ${item.rating || "—"}/10
+                    ⭐ ${item.rating ?? "—"}/10
                 </div>
 
                 <div class="card-meta">
@@ -900,12 +856,9 @@ function render(list) {
                 </div>
 
             </div>
-
         `;
 
-
         library.appendChild(card);
-
     });
 }
 
@@ -914,20 +867,20 @@ function render(list) {
    ОТКРЫТИЕ АНИМЕ
    ============================== */
 
-function openAnime(item) {
+async function openAnime(item) {
 
     const modal =
         document.getElementById("modal");
 
-
     const content =
         document.getElementById("modalContent");
-
 
     const poster =
         item.poster ||
         "https://via.placeholder.com/600x900/15151b/ffffff?text=Anime";
 
+    const admin =
+        await isAdmin();
 
     content.innerHTML = `
 
@@ -943,7 +896,6 @@ function openAnime(item) {
                 ${item.title || "Без названия"}
             </h2>
 
-
             <div class="info">
 
                 <div>
@@ -958,7 +910,7 @@ function openAnime(item) {
 
                 <div>
                     ⭐ Моя оценка:
-                    ${item.rating || "—"}/10
+                    ${item.rating ?? "—"}/10
                 </div>
 
                 <div>
@@ -983,7 +935,6 @@ function openAnime(item) {
 
             </div>
 
-
             <div class="section-title">
                 📝 Описание
             </div>
@@ -991,7 +942,6 @@ function openAnime(item) {
             <div class="description">
                 ${item.description || "Описание отсутствует."}
             </div>
-
 
             <div class="section-title">
                 💭 Моё мнение
@@ -1001,10 +951,30 @@ function openAnime(item) {
                 ${item.comment || "Комментарий отсутствует."}
             </div>
 
+            ${
+                admin
+                ? `
+                <div class="admin-actions">
+
+                    <button
+                        class="edit-button"
+                        onclick='editAnime(${JSON.stringify(item)})'>
+                        ✏️ Редактировать
+                    </button>
+
+                    <button
+                        class="delete-button"
+                        onclick="deleteAnime('${item.id}')">
+                        🗑️ Удалить
+                    </button>
+
+                </div>
+                `
+                : ""
+            }
+
         </div>
-
     `;
-
 
     modal.style.display = "block";
 
@@ -1014,14 +984,13 @@ function openAnime(item) {
 
 
 /* ==============================
-   ЗАКРЫТИЕ АНИМЕ
+   ЗАКРЫТИЕ
    ============================== */
 
 function closeAnime() {
 
     document.getElementById("modal")
         .style.display = "none";
-
 
     document.body.style.overflow =
         "auto";
@@ -1041,14 +1010,12 @@ function searchAnime() {
         .toLowerCase()
         .trim();
 
-
     if (!query) {
 
         render(anime);
 
         return;
     }
-
 
     const result =
         anime.filter(item => {
@@ -1059,7 +1026,6 @@ function searchAnime() {
 
             return title.includes(query);
         });
-
 
     render(result);
 }
@@ -1082,17 +1048,6 @@ function showWatched() {
             item.status === "Просмотрено"
         )
     );
-}
-
-
-function showFavorites() {
-
-    /*
-       Избранное пока не подключено.
-       Временно показываем всю библиотеку.
-    */
-
-    render(anime);
 }
 
 
@@ -1129,17 +1084,14 @@ async function login() {
         .value
         .trim();
 
-
     const password =
         document
         .getElementById("loginPassword")
         .value;
 
-
     const message =
         document
         .getElementById("loginMessage");
-
 
     if (!email || !password) {
 
@@ -1149,17 +1101,15 @@ async function login() {
         return;
     }
 
-
     message.textContent =
         "⏳ Выполняю вход...";
 
-
-    const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
+    const { error } =
+        await supabaseClient.auth
+        .signInWithPassword({
             email: email,
             password: password
         });
-
 
     if (error) {
 
@@ -1171,16 +1121,16 @@ async function login() {
         return;
     }
 
-
     message.textContent =
         "✅ Вход выполнен!";
-
 
     setTimeout(() => {
 
         closeLogin();
 
         updateAuthPanel();
+
+        loadAnime();
 
     }, 500);
 }
@@ -1195,12 +1145,10 @@ async function updateAuthPanel() {
     const panel =
         document.getElementById("authPanel");
 
-
     const {
         data: { user }
     } =
         await supabaseClient.auth.getUser();
-
 
     if (user) {
 
@@ -1221,7 +1169,6 @@ async function updateAuthPanel() {
                 onclick="logout()">
                 🚪 Выйти
             </button>
-
         `;
 
     } else {
@@ -1233,7 +1180,6 @@ async function updateAuthPanel() {
                 onclick="openLogin()">
                 🔐 Войти
             </button>
-
         `;
     }
 }
@@ -1248,220 +1194,16 @@ async function logout() {
     await supabaseClient.auth.signOut();
 
     updateAuthPanel();
+
+    closeAnime();
 }
 
 
 /* ==============================
-   ОКНО ДОБАВЛЕНИЯ
+   ОЧИСТКА ФОРМЫ
    ============================== */
 
-function openAddAnime() {
-
-    document.getElementById("addModal")
-        .style.display = "block";
-
-    document.getElementById("addMessage")
-        .textContent = "";
-
-    document.body.style.overflow =
-        "hidden";
-}
-
-
-function closeAddAnime() {
-
-    document.getElementById("addModal")
-        .style.display = "none";
-
-    document.body.style.overflow =
-        "auto";
-}
-
-
-/* ==============================
-   ДОБАВЛЕНИЕ АНИМЕ
-   ============================== */
-
-async function addAnime() {
-
-    const message =
-        document.getElementById("addMessage");
-
-
-    /* Проверяем пользователя */
-
-    const {
-        data: { user }
-    } =
-        await supabaseClient.auth.getUser();
-
-
-    if (!user) {
-
-        message.textContent =
-            "❌ Сначала войди в аккаунт.";
-
-        return;
-    }
-
-
-    /* Получаем данные */
-
-    const title =
-        document
-        .getElementById("addTitle")
-        .value
-        .trim();
-
-
-    const poster =
-        document
-        .getElementById("addPoster")
-        .value
-        .trim();
-
-
-    const yearValue =
-        document
-        .getElementById("addYear")
-        .value;
-
-
-    const episodesValue =
-        document
-        .getElementById("addEpisodes")
-        .value;
-
-
-    const ratingValue =
-        document
-        .getElementById("addRating")
-        .value;
-
-
-    const dub =
-        document
-        .getElementById("addDub")
-        .value
-        .trim();
-
-
-    const status =
-        document
-        .getElementById("addStatus")
-        .value;
-
-
-    const continuation =
-        document
-        .getElementById("addContinuation")
-        .value
-        .trim();
-
-
-    const genres =
-        document
-        .getElementById("addGenres")
-        .value
-        .trim();
-
-
-    const description =
-        document
-        .getElementById("addDescription")
-        .value
-        .trim();
-
-
-    const comment =
-        document
-        .getElementById("addComment")
-        .value
-        .trim();
-
-
-    /* Проверка названия */
-
-    if (!title) {
-
-        message.textContent =
-            "⚠️ Введи название аниме.";
-
-        return;
-    }
-
-
-    message.textContent =
-        "⏳ Сохраняю аниме...";
-
-
-    /* Данные для Supabase */
-
-    const newAnime = {
-
-        title: title,
-
-        poster: poster || null,
-
-        year: yearValue
-            ? Number(yearValue)
-            : null,
-
-        episodes: episodesValue
-            ? Number(episodesValue)
-            : null,
-
-        rating: ratingValue
-            ? Number(ratingValue)
-            : null,
-
-        dub: dub || null,
-
-        status: status || null,
-
-        continuation:
-            continuation || null,
-
-        genres:
-            genres || null,
-
-        description:
-            description || null,
-
-        comment:
-            comment || null
-
-    };
-
-
-    /* Отправляем в Supabase */
-
-    const { data, error } =
-        await supabaseClient
-        .from("anime")
-        .insert([newAnime])
-        .select();
-
-
-    if (error) {
-
-        console.error(error);
-
-        message.textContent =
-            "❌ Ошибка: " +
-            error.message;
-
-        return;
-    }
-
-
-    /* Успешно */
-
-    message.textContent =
-        "✅ Аниме добавлено!";
-
-
-    /* Очищаем форму */
+function clearForm() {
 
     document.getElementById("addTitle").value = "";
 
@@ -1485,12 +1227,295 @@ async function addAnime() {
     document.getElementById("addDescription").value = "";
 
     document.getElementById("addComment").value = "";
+}
 
 
-    /* Обновляем библиотеку */
+/* ==============================
+   ОКНО ДОБАВЛЕНИЯ
+   ============================== */
+
+function openAddAnime() {
+
+    editingAnimeId = null;
+
+    document.getElementById("formTitle")
+        .textContent = "➕ Добавить аниме";
+
+    document.getElementById("formSaveButton")
+        .textContent = "💾 Сохранить";
+
+    clearForm();
+
+    document.getElementById("addMessage")
+        .textContent = "";
+
+    document.getElementById("addModal")
+        .style.display = "block";
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function closeAddAnime() {
+
+    document.getElementById("addModal")
+        .style.display = "none";
+
+    editingAnimeId = null;
+
+    document.body.style.overflow =
+        "auto";
+}
+
+
+/* ==============================
+   РЕДАКТИРОВАНИЕ
+   ============================== */
+
+async function editAnime(item) {
+
+    const admin =
+        await isAdmin();
+
+    if (!admin) {
+
+        alert("❌ Нет доступа.");
+
+        return;
+    }
+
+    closeAnime();
+
+    editingAnimeId = item.id;
+
+    document.getElementById("formTitle")
+        .textContent = "✏️ Редактировать аниме";
+
+    document.getElementById("formSaveButton")
+        .textContent = "💾 Сохранить изменения";
+
+    document.getElementById("addTitle").value =
+        item.title || "";
+
+    document.getElementById("addPoster").value =
+        item.poster || "";
+
+    document.getElementById("addYear").value =
+        item.year ?? "";
+
+    document.getElementById("addEpisodes").value =
+        item.episodes ?? "";
+
+    document.getElementById("addRating").value =
+        item.rating ?? "";
+
+    document.getElementById("addDub").value =
+        item.dub || "";
+
+    document.getElementById("addStatus").value =
+        item.status || "Просмотрено";
+
+    document.getElementById("addContinuation").value =
+        item.continuation || "";
+
+    document.getElementById("addGenres").value =
+        item.genres || "";
+
+    document.getElementById("addDescription").value =
+        item.description || "";
+
+    document.getElementById("addComment").value =
+        item.comment || "";
+
+    document.getElementById("addMessage")
+        .textContent = "";
+
+    document.getElementById("addModal")
+        .style.display = "block";
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+/* ==============================
+   СОХРАНЕНИЕ
+   ============================== */
+
+async function saveAnime() {
+
+    const message =
+        document.getElementById("addMessage");
+
+    const admin =
+        await isAdmin();
+
+    if (!admin) {
+
+        message.textContent =
+            "❌ Нет доступа.";
+
+        return;
+    }
+
+    const title =
+        document.getElementById("addTitle")
+        .value
+        .trim();
+
+    if (!title) {
+
+        message.textContent =
+            "⚠️ Введи название аниме.";
+
+        return;
+    }
+
+    const poster =
+        document.getElementById("addPoster")
+        .value
+        .trim();
+
+    const yearValue =
+        document.getElementById("addYear")
+        .value;
+
+    const episodesValue =
+        document.getElementById("addEpisodes")
+        .value;
+
+    const ratingValue =
+        document.getElementById("addRating")
+        .value;
+
+    const dub =
+        document.getElementById("addDub")
+        .value
+        .trim();
+
+    const status =
+        document.getElementById("addStatus")
+        .value;
+
+    const continuation =
+        document.getElementById("addContinuation")
+        .value
+        .trim();
+
+    const genres =
+        document.getElementById("addGenres")
+        .value
+        .trim();
+
+    const description =
+        document.getElementById("addDescription")
+        .value
+        .trim();
+
+    const comment =
+        document.getElementById("addComment")
+        .value
+        .trim();
+
+    const animeData = {
+
+        title: title,
+
+        poster:
+            poster || null,
+
+        year:
+            yearValue
+            ? Number(yearValue)
+            : null,
+
+        episodes:
+            episodesValue
+            ? Number(episodesValue)
+            : null,
+
+        rating:
+            ratingValue
+            ? Number(ratingValue)
+            : null,
+
+        dub:
+            dub || null,
+
+        status:
+            status || null,
+
+        continuation:
+            continuation || null,
+
+        genres:
+            genres || null,
+
+        description:
+            description || null,
+
+        comment:
+            comment || null
+    };
+
+    message.textContent =
+        "⏳ Сохраняю...";
+
+
+    /* РЕДАКТИРОВАНИЕ */
+
+    if (editingAnimeId) {
+
+        const { error } =
+            await supabaseClient
+            .from("anime")
+            .update(animeData)
+            .eq("id", editingAnimeId);
+
+        if (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "❌ Ошибка: " +
+                error.message;
+
+            return;
+        }
+
+        message.textContent =
+            "✅ Изменения сохранены!";
+
+    }
+
+
+    /* ДОБАВЛЕНИЕ */
+
+    else {
+
+        const { error } =
+            await supabaseClient
+            .from("anime")
+            .insert([animeData]);
+
+        if (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "❌ Ошибка: " +
+                error.message;
+
+            return;
+        }
+
+        message.textContent =
+            "✅ Аниме добавлено!";
+    }
+
 
     await loadAnime();
-
 
     setTimeout(() => {
 
@@ -1501,11 +1526,70 @@ async function addAnime() {
 
 
 /* ==============================
-   АВТОМАТИЧЕСКОЕ ОТСЛЕЖИВАНИЕ ВХОДА
+   УДАЛЕНИЕ
+   ============================== */
+
+async function deleteAnime(id) {
+
+    const admin =
+        await isAdmin();
+
+    if (!admin) {
+
+        alert("❌ Нет доступа.");
+
+        return;
+    }
+
+    const item =
+        anime.find(a => a.id === id);
+
+    const title =
+        item
+        ? item.title
+        : "это аниме";
+
+    const confirmed =
+        confirm(
+            "🗑️ Удалить «" +
+            title +
+            "»?\n\nЭто действие нельзя отменить."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const { error } =
+        await supabaseClient
+        .from("anime")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "❌ Не удалось удалить:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+    closeAnime();
+
+    await loadAnime();
+}
+
+
+/* ==============================
+   АВТОРИЗАЦИЯ
    ============================== */
 
 supabaseClient.auth.onAuthStateChange(
-    (event, session) => {
+    () => {
 
         updateAuthPanel();
 
@@ -1524,4 +1608,4 @@ updateAuthPanel();
 </script>
 
 </body>
-    </html> 2
+    </html>
