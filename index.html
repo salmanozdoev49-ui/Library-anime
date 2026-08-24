@@ -7,6 +7,7 @@
 <title>Anime Library</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -33,11 +34,20 @@ header p {
     margin: 8px 0 0;
 }
 
-/* АВТОРИЗАЦИЯ */
+
+/* ==============================
+   АВТОРИЗАЦИЯ
+   ============================== */
 
 .auth-panel {
-    padding: 0 18px 10px;
+    padding: 0 18px 12px;
     text-align: center;
+}
+
+.auth-user {
+    color: #aaa;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .auth-button {
@@ -48,19 +58,27 @@ header p {
     color: white;
     font-size: 15px;
     cursor: pointer;
+    margin: 3px;
 }
 
 .auth-button:hover {
     background: #25252d;
 }
 
-.auth-user {
-    color: #aaa;
-    margin-bottom: 8px;
-    font-size: 14px;
+.add-button {
+    background: #ffd54a;
+    color: #111;
+    font-weight: bold;
 }
 
-/* ПОИСК */
+.add-button:hover {
+    background: #ffe27a;
+}
+
+
+/* ==============================
+   ПОИСК
+   ============================== */
 
 .search {
     padding: 10px 18px;
@@ -77,7 +95,10 @@ header p {
     outline: none;
 }
 
-/* ФИЛЬТРЫ */
+
+/* ==============================
+   ФИЛЬТРЫ
+   ============================== */
 
 .filters {
     display: flex;
@@ -96,7 +117,10 @@ header p {
     cursor: pointer;
 }
 
-/* БИБЛИОТЕКА */
+
+/* ==============================
+   БИБЛИОТЕКА
+   ============================== */
 
 .library {
     display: grid;
@@ -139,7 +163,10 @@ header p {
     color: #ffd54a;
 }
 
-/* КАРТОЧКА АНИМЕ */
+
+/* ==============================
+   ОБЩЕЕ ОКНО
+   ============================== */
 
 .modal {
     position: fixed;
@@ -172,6 +199,11 @@ header p {
     z-index: 101;
     cursor: pointer;
 }
+
+
+/* ==============================
+   КАРТОЧКА АНИМЕ
+   ============================== */
 
 .modal-poster {
     width: 100%;
@@ -216,6 +248,11 @@ header p {
     color: #ffd54a;
 }
 
+
+/* ==============================
+   ЗАГРУЗКА / ОШИБКА
+   ============================== */
+
 .loading {
     grid-column: 1 / -1;
     text-align: center;
@@ -230,7 +267,85 @@ header p {
     padding: 50px 10px;
 }
 
-/* ОКНО ВХОДА */
+
+/* ==============================
+   ФОРМА
+   ============================== */
+
+.form-box {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.form-box h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.form-label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1px solid #303038;
+    background: #191920;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.form-save {
+    flex: 1;
+    padding: 13px;
+    border: 0;
+    border-radius: 10px;
+    background: #ffd54a;
+    color: #111;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-cancel {
+    flex: 1;
+    padding: 13px;
+    border: 0;
+    border-radius: 10px;
+    background: #25252d;
+    color: white;
+    cursor: pointer;
+}
+
+.form-message {
+    text-align: center;
+    margin-top: 15px;
+    color: #aaa;
+}
+
+
+/* ==============================
+   ОКНО ВХОДА
+   ============================== */
 
 .login-box {
     max-width: 400px;
@@ -266,7 +381,6 @@ header p {
     background: #ffd54a;
     color: #111;
     font-weight: bold;
-    font-size: 15px;
     cursor: pointer;
 }
 
@@ -287,17 +401,25 @@ header p {
     color: #aaa;
     line-height: 1.4;
 }
+
 </style>
 </head>
 
 <body>
 
+
 <header>
+
     <h1>🎌 Anime Library</h1>
+
     <p>Моя личная библиотека аниме</p>
+
 </header>
 
-<!-- АВТОРИЗАЦИЯ -->
+
+<!-- ==============================
+     ПАНЕЛЬ АККАУНТА
+     ============================== -->
 
 <div
     class="auth-panel"
@@ -305,19 +427,25 @@ header p {
 </div>
 
 
-<!-- ПОИСК -->
+<!-- ==============================
+     ПОИСК
+     ============================== -->
 
 <div class="search">
+
     <input
         id="search"
         type="text"
         placeholder="🔎 Найти аниме..."
         oninput="searchAnime()"
     >
+
 </div>
 
 
-<!-- ФИЛЬТРЫ -->
+<!-- ==============================
+     ФИЛЬТРЫ
+     ============================== -->
 
 <div class="filters">
 
@@ -336,7 +464,9 @@ header p {
 </div>
 
 
-<!-- БИБЛИОТЕКА -->
+<!-- ==============================
+     БИБЛИОТЕКА
+     ============================== -->
 
 <div
     class="library"
@@ -344,7 +474,9 @@ header p {
 </div>
 
 
-<!-- ОКНО АНИМЕ -->
+<!-- ==============================
+     ОКНО АНИМЕ
+     ============================== -->
 
 <div
     class="modal"
@@ -364,7 +496,9 @@ header p {
 </div>
 
 
-<!-- ОКНО ВХОДА -->
+<!-- ==============================
+     ОКНО ВХОДА
+     ============================== -->
 
 <div
     class="modal"
@@ -410,11 +544,212 @@ header p {
 </div>
 
 
-<!-- SUPABASE -->
+<!-- ==============================
+     ОКНО ДОБАВЛЕНИЯ
+     ============================== -->
+
+<div
+    class="modal"
+    id="addModal">
+
+    <button
+        class="close"
+        onclick="closeAddAnime()">
+        ×
+    </button>
+
+    <div class="modal-content">
+
+        <div class="form-box">
+
+            <h2>➕ Добавить аниме</h2>
+
+
+            <label class="form-label">
+                🎌 Название
+            </label>
+
+            <input
+                class="form-input"
+                id="addTitle"
+                type="text"
+                placeholder="Например: Наруто"
+            >
+
+
+            <label class="form-label">
+                🖼️ Постер — ссылка
+            </label>
+
+            <input
+                class="form-input"
+                id="addPoster"
+                type="url"
+                placeholder="https://..."
+            >
+
+
+            <label class="form-label">
+                📅 Год
+            </label>
+
+            <input
+                class="form-input"
+                id="addYear"
+                type="number"
+                placeholder="2026"
+            >
+
+
+            <label class="form-label">
+                📺 Количество серий
+            </label>
+
+            <input
+                class="form-input"
+                id="addEpisodes"
+                type="number"
+                placeholder="12"
+            >
+
+
+            <label class="form-label">
+                ⭐ Моя оценка
+            </label>
+
+            <input
+                class="form-input"
+                id="addRating"
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                placeholder="9"
+            >
+
+
+            <label class="form-label">
+                🎙️ Озвучка
+            </label>
+
+            <input
+                class="form-input"
+                id="addDub"
+                type="text"
+                placeholder="AniLibria"
+            >
+
+
+            <label class="form-label">
+                👀 Статус
+            </label>
+
+            <select
+                class="form-select"
+                id="addStatus">
+
+                <option value="Просмотрено">
+                    Просмотрено
+                </option>
+
+                <option value="Смотрю">
+                    Смотрю
+                </option>
+
+                <option value="Запланировано">
+                    Запланировано
+                </option>
+
+                <option value="Брошено">
+                    Брошено
+                </option>
+
+            </select>
+
+
+            <label class="form-label">
+                🔮 Продолжение
+            </label>
+
+            <input
+                class="form-input"
+                id="addContinuation"
+                type="text"
+                placeholder="Анонсировано"
+            >
+
+
+            <label class="form-label">
+                🎭 Жанры
+            </label>
+
+            <input
+                class="form-input"
+                id="addGenres"
+                type="text"
+                placeholder="Экшен, Фэнтези, Приключения"
+            >
+
+
+            <label class="form-label">
+                📝 Описание
+            </label>
+
+            <textarea
+                class="form-textarea"
+                id="addDescription"
+                placeholder="Описание аниме..."
+            ></textarea>
+
+
+            <label class="form-label">
+                💭 Моё мнение
+            </label>
+
+            <textarea
+                class="form-textarea"
+                id="addComment"
+                placeholder="Твоё личное мнение..."
+            ></textarea>
+
+
+            <div class="form-actions">
+
+                <button
+                    class="form-cancel"
+                    onclick="closeAddAnime()">
+                    Отмена
+                </button>
+
+                <button
+                    class="form-save"
+                    onclick="addAnime()">
+                    💾 Сохранить
+                </button>
+
+            </div>
+
+
+            <div
+                class="form-message"
+                id="addMessage">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     SUPABASE
+     ============================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
 
 /* ==============================
    SUPABASE
@@ -422,6 +757,7 @@ header p {
 
 const SUPABASE_URL =
     "https://hvmvgrkoazojrpmtbnzj.supabase.co";
+
 
 const SUPABASE_KEY =
     "sb_publishable_Jl93cw1rKXPSrzsoRx3mNw_euPMZEvE";
@@ -460,6 +796,7 @@ async function loadAnime() {
 
     library.innerHTML =
         '<div class="loading">⏳ Загружаю библиотеку...</div>';
+
 
     const { data, error } =
         await supabaseClient
@@ -522,6 +859,7 @@ function render(list) {
 
         card.className = "card";
 
+
         card.onclick = () =>
             openAnime(item);
 
@@ -580,6 +918,7 @@ function openAnime(item) {
 
     const modal =
         document.getElementById("modal");
+
 
     const content =
         document.getElementById("modalContent");
@@ -683,6 +1022,7 @@ function closeAnime() {
     document.getElementById("modal")
         .style.display = "none";
 
+
     document.body.style.overflow =
         "auto";
 }
@@ -748,9 +1088,8 @@ function showWatched() {
 function showFavorites() {
 
     /*
-       Пока избранное не настроено.
-       Поэтому временно показываем
-       всю библиотеку.
+       Избранное пока не подключено.
+       Временно показываем всю библиотеку.
     */
 
     render(anime);
@@ -758,7 +1097,7 @@ function showFavorites() {
 
 
 /* ==============================
-   ВХОД
+   ОКНО ВХОДА
    ============================== */
 
 function openLogin() {
@@ -779,7 +1118,7 @@ function closeLogin() {
 
 
 /* ==============================
-   АВТОРИЗАЦИЯ
+   ВХОД
    ============================== */
 
 async function login() {
@@ -790,10 +1129,12 @@ async function login() {
         .value
         .trim();
 
+
     const password =
         document
         .getElementById("loginPassword")
         .value;
+
 
     const message =
         document
@@ -846,7 +1187,7 @@ async function login() {
 
 
 /* ==============================
-   ПРОВЕРКА ПОЛЬЗОВАТЕЛЯ
+   ПАНЕЛЬ АККАУНТА
    ============================== */
 
 async function updateAuthPanel() {
@@ -868,6 +1209,12 @@ async function updateAuthPanel() {
             <div class="auth-user">
                 👤 Вы вошли
             </div>
+
+            <button
+                class="auth-button add-button"
+                onclick="openAddAnime()">
+                ➕ Добавить аниме
+            </button>
 
             <button
                 class="auth-button"
@@ -905,7 +1252,256 @@ async function logout() {
 
 
 /* ==============================
-   СЛЕЖЕНИЕ ЗА СЕССИЕЙ
+   ОКНО ДОБАВЛЕНИЯ
+   ============================== */
+
+function openAddAnime() {
+
+    document.getElementById("addModal")
+        .style.display = "block";
+
+    document.getElementById("addMessage")
+        .textContent = "";
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function closeAddAnime() {
+
+    document.getElementById("addModal")
+        .style.display = "none";
+
+    document.body.style.overflow =
+        "auto";
+}
+
+
+/* ==============================
+   ДОБАВЛЕНИЕ АНИМЕ
+   ============================== */
+
+async function addAnime() {
+
+    const message =
+        document.getElementById("addMessage");
+
+
+    /* Проверяем пользователя */
+
+    const {
+        data: { user }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        message.textContent =
+            "❌ Сначала войди в аккаунт.";
+
+        return;
+    }
+
+
+    /* Получаем данные */
+
+    const title =
+        document
+        .getElementById("addTitle")
+        .value
+        .trim();
+
+
+    const poster =
+        document
+        .getElementById("addPoster")
+        .value
+        .trim();
+
+
+    const yearValue =
+        document
+        .getElementById("addYear")
+        .value;
+
+
+    const episodesValue =
+        document
+        .getElementById("addEpisodes")
+        .value;
+
+
+    const ratingValue =
+        document
+        .getElementById("addRating")
+        .value;
+
+
+    const dub =
+        document
+        .getElementById("addDub")
+        .value
+        .trim();
+
+
+    const status =
+        document
+        .getElementById("addStatus")
+        .value;
+
+
+    const continuation =
+        document
+        .getElementById("addContinuation")
+        .value
+        .trim();
+
+
+    const genres =
+        document
+        .getElementById("addGenres")
+        .value
+        .trim();
+
+
+    const description =
+        document
+        .getElementById("addDescription")
+        .value
+        .trim();
+
+
+    const comment =
+        document
+        .getElementById("addComment")
+        .value
+        .trim();
+
+
+    /* Проверка названия */
+
+    if (!title) {
+
+        message.textContent =
+            "⚠️ Введи название аниме.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "⏳ Сохраняю аниме...";
+
+
+    /* Данные для Supabase */
+
+    const newAnime = {
+
+        title: title,
+
+        poster: poster || null,
+
+        year: yearValue
+            ? Number(yearValue)
+            : null,
+
+        episodes: episodesValue
+            ? Number(episodesValue)
+            : null,
+
+        rating: ratingValue
+            ? Number(ratingValue)
+            : null,
+
+        dub: dub || null,
+
+        status: status || null,
+
+        continuation:
+            continuation || null,
+
+        genres:
+            genres || null,
+
+        description:
+            description || null,
+
+        comment:
+            comment || null
+
+    };
+
+
+    /* Отправляем в Supabase */
+
+    const { data, error } =
+        await supabaseClient
+        .from("anime")
+        .insert([newAnime])
+        .select();
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.textContent =
+            "❌ Ошибка: " +
+            error.message;
+
+        return;
+    }
+
+
+    /* Успешно */
+
+    message.textContent =
+        "✅ Аниме добавлено!";
+
+
+    /* Очищаем форму */
+
+    document.getElementById("addTitle").value = "";
+
+    document.getElementById("addPoster").value = "";
+
+    document.getElementById("addYear").value = "";
+
+    document.getElementById("addEpisodes").value = "";
+
+    document.getElementById("addRating").value = "";
+
+    document.getElementById("addDub").value = "";
+
+    document.getElementById("addStatus").value =
+        "Просмотрено";
+
+    document.getElementById("addContinuation").value = "";
+
+    document.getElementById("addGenres").value = "";
+
+    document.getElementById("addDescription").value = "";
+
+    document.getElementById("addComment").value = "";
+
+
+    /* Обновляем библиотеку */
+
+    await loadAnime();
+
+
+    setTimeout(() => {
+
+        closeAddAnime();
+
+    }, 700);
+}
+
+
+/* ==============================
+   АВТОМАТИЧЕСКОЕ ОТСЛЕЖИВАНИЕ ВХОДА
    ============================== */
 
 supabaseClient.auth.onAuthStateChange(
@@ -928,4 +1524,4 @@ updateAuthPanel();
 </script>
 
 </body>
-    </html>
+    </html> 2
