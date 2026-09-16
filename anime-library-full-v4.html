@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Библиотека аниме</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0a0a0c;--panel:#151518;--panel2:#202024;--text:#f5f5f7;--muted:#a0a0a8;--red:#e53935;--line:#2b2b31}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.app{width:min(100%,980px);margin:auto;padding:16px 12px 90px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+h1{font-size:clamp(23px,6vw,34px);margin:0;font-weight:800}h2{margin:8px 0 14px}
+.top-actions{display:flex;gap:7px}.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:11px;padding:9px 12px}.primary{background:var(--red);border-color:var(--red);font-weight:700}.danger{background:#2a1212;border-color:#632020;color:#ffb0b0}
+.search{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;outline:none;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.card{position:relative;min-height:178px;border:1px solid var(--line);border-radius:14px;background:#17171b;display:flex;align-items:flex-end;padding:9px;overflow:hidden;color:white;text-align:left}.card::before{content:"";position:absolute;inset:0;background-image:var(--card-poster);background-size:cover;background-position:center;z-index:0}.card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.84),rgba(0,0,0,.08) 65%,rgba(0,0,0,.02));z-index:1}.card:hover{border-color:#55555e}.card-title{position:relative;z-index:2;width:100%;font-weight:700;font-size:11.5px;line-height:1.25;background:#000a;border-radius:8px;padding:8px}
+.empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:35px 10px}
+nav{position:fixed;left:50%;bottom:11px;transform:translateX(-50%);width:min(calc(100% - 22px),560px);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#18181cde;backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;padding:6px;z-index:20}nav button{background:transparent;border:0;color:var(--muted);padding:8px 3px;border-radius:10px;font-size:12px}nav button.active{background:#2a2a2f;color:white}
+.page{display:none}.page.active{display:block}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px}.stat b{display:block;font-size:24px;margin-top:4px}.muted{color:var(--muted)}
+.modal-bg{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:12px;z-index:50}.modal-bg.show{display:flex}.modal{width:min(100%,570px);max-height:92vh;overflow:auto;background:#141417;border:1px solid var(--line);border-radius:18px;padding:17px;position:relative}.close{position:absolute;right:10px;top:7px;border:0;background:transparent;color:#aaa;font-size:25px}
+.poster{width:min(45vw,210px);height:min(60vw,290px);object-fit:cover;border-radius:11px;display:block;margin:0 auto 14px;background:#242429}.info h2{font-size:19px;margin:0 30px 12px 0}.row{margin:6px 0;line-height:1.35;font-size:13px}.label{color:#999;font-size:11px}.description{white-space:pre-wrap}.info .chip{padding:5px 7px;font-size:11px}.info .actions{margin-top:9px}.info .actions .btn{padding:7px 10px;font-size:12px}
+.statuses{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}.chip{border:1px solid #3b3b42;background:#202025;color:#ddd;border-radius:999px;padding:7px 9px;font-size:12px}.chip.on{background:#5c1717;border-color:var(--red);color:white}
+.form{display:grid;gap:10px}.form input,.form textarea{width:100%;background:#0c0c0f;border:1px solid var(--line);border-radius:10px;color:white;padding:11px;outline:none}.form textarea{min-height:90px;resize:vertical}.status-grid{display:flex;flex-wrap:wrap;gap:6px}.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.notice{font-size:12px;color:#aaa;line-height:1.4}
+.auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.auth-box{width:min(100%,420px);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}.auth-box h1{margin-bottom:5px}.auth-box p{color:var(--muted);font-size:13px}.auth-form{display:grid;gap:10px;margin-top:15px}.auth-form input{background:#0c0c0f;border:1px solid var(--line);border-radius:10px;color:white;padding:12px;outline:none}.auth-actions{display:flex;gap:8px;margin-top:3px}.auth-actions button{flex:1}
+.filebox{background:#0d0d10;border:1px dashed #444;border-radius:11px;padding:10px}.filebox input{width:100%}.preview-mini{width:65px;height:90px;object-fit:cover;border-radius:7px;margin-top:8px;display:none}.poster-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+@media(max-width:520px){.app{padding:13px 9px 90px}.grid{gap:8px}.card{min-height:150px;padding:7px}.card-title{font-size:10.5px;padding:6px}.modal{padding:14px}.poster{width:165px;height:225px}.stats{gap:7px}}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth">
+ <div class="auth-box">
+  <h1>Библиотека аниме</h1>
+  <p>Войди в свой аккаунт, чтобы открыть личную библиотеку.</p>
+  <div class="auth-form">
+   <input id="authEmail" type="email" placeholder="Email">
+   <input id="authPassword" type="password" placeholder="Пароль">
+   <div class="auth-actions">
+    <button class="btn primary" id="loginBtn">Войти</button>
+    <button class="btn" id="signupBtn">Регистрация</button>
+   </div>
+   <div id="authMsg" class="notice"></div>
+  </div>
+ </div>
+</div>
+
+<div id="appScreen" class="app hidden">
+<header>
+ <h1>Библиотека аниме</h1>
+ <div class="top-actions">
+  <button class="btn primary" id="addBtn">＋ Добавить</button>
+  <button class="btn" id="logoutBtn">Выйти</button>
+ </div>
+</header>
+
+<section id="home" class="page active">
+<input id="search" class="search" placeholder="🔎 Поиск аниме...">
+<div id="homeGrid" class="grid"></div>
+</section>
+
+<section id="favorites" class="page">
+<h2>👍 Избранное</h2>
+<p class="notice">Один тайтл может иметь несколько статусов одновременно.</p>
+<div id="favFilters" class="statuses" style="margin-bottom:12px"></div>
+<div id="favGrid" class="grid"></div>
+</section>
+
+<section id="profile" class="page">
+<h2>Профиль</h2>
+<div id="userEmail" class="notice"></div>
+<div class="stats" id="stats"></div>
+</section>
+</div>
+
+<nav id="nav" class="hidden">
+<button class="active" data-page="home">🏠<br>Главная</button>
+<button data-page="favorites">👍<br>Избранное</button>
+<button data-page="profile">👤<br>Профиль</button>
+</nav>
+
+<div class="modal-bg" id="detailsBg"><div class="modal">
+<button class="close" id="detailsClose">×</button><div id="details"></div>
+</div></div>
+
+<div class="modal-bg" id="formBg"><div class="modal">
+<button class="close" id="formClose">×</button>
+<h2 id="formTitle">Добавить аниме</h2>
+<div class="form">
+<input id="fTitle" placeholder="Название *">
+<input id="fYear" type="number" placeholder="Год">
+<input id="fVoice" placeholder="Озвучка">
+<div class="filebox">
+ <div class="label">Постер с телефона</div>
+ <input id="fPosterFile" type="file" accept="image/*">
+ <img id="previewMini" class="preview-mini">
+ <div id="posterPreview" class="notice">Выбери изображение. При редактировании новый файл заменит текущий.</div>
+ <div class="poster-tools"><button type="button" class="btn danger hidden" id="removePosterBtn">Удалить постер</button></div>
+</div>
+<textarea id="fDesc" placeholder="Описание"></textarea>
+<div><div class="label">Статусы</div><div class="status-grid" id="statusGrid"></div></div>
+</div>
+<div class="actions"><button class="btn" id="cancelForm">Отмена</button><button class="btn primary" id="saveAnime">Сохранить</button></div>
+</div></div>
+
+<script>
+const SUPABASE_URL="YOUR_SUPABASE_URL";
+const SUPABASE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY";
+const configured=!SUPABASE_URL.startsWith("YOUR_")&&!SUPABASE_KEY.startsWith("YOUR_");
+const sb=configured?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+
+const STATUSES=["Просмотрено","Планирую","Анонс","Закончено","Жду продолжение"];
+let anime=[],editingId=null,selectedStatuses=new Set(),selectedPosterFile=null,removePoster=false,currentUser=null;
+
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function chips(statuses,interactive=false){
+ return STATUSES.map(s=>`<button type="button" class="chip ${statuses?.includes(s)?"on":""}" ${interactive?`data-status="${esc(s)}"`:""}>${esc(s)}</button>`).join("");
+}
+function card(a){
+ const poster=a.poster_url
+   ? `<img class="card-poster" src="${esc(a.poster_url)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+   : "";
+ return `<button class="card" data-id="${esc(a.id)}">${poster}<span class="card-shade"></span><span class="card-title">${esc(a.title)}</span></button>`;
+}
+function render(){
+ const q=$("search").value.trim().toLowerCase();
+ renderGrid("homeGrid",anime.filter(a=>a.title.toLowerCase().includes(q)));
+ renderFavoriteFilters();
+ const favoriteList=anime.filter(a=>(a.statuses||[]).length && (favoriteFilter==="Все" || (a.statuses||[]).includes(favoriteFilter)));
+ renderGrid("favGrid",favoriteList);
+ const counts=Object.fromEntries(STATUSES.map(s=>[s,anime.filter(a=>(a.statuses||[]).includes(s)).length]));
+ $("stats").innerHTML=STATUSES.map(s=>`<div class="stat">${esc(s)}<b>${counts[s]}</b></div>`).join("");
+ if(currentUser)$("userEmail").textContent=currentUser.email;
+}
+async function loadAnime(){
+ if(!sb)return;
+ const {data,error}=await sb.from("anime").select("*").order("created_at",{ascending:false});
+ if(error){console.error(error);return alert("Ошибка загрузки: "+error.message)}
+ anime=data||[];render();
+}
+function showApp(user){
+ currentUser=user;$("authScreen").classList.add("hidden");$("appScreen").classList.remove("hidden");$("nav").classList.remove("hidden");render();loadAnime();
+}
+function showAuth(){currentUser=null;$("appScreen").classList.add("hidden");$("nav").classList.add("hidden");$("authScreen").classList.remove("hidden");}
+async function boot(){
+ if(!configured){$("authMsg").textContent="Сначала вставь SUPABASE_URL и SUPABASE_PUBLISHABLE_KEY в этот файл.";return;}
+ const {data:{session}}=await sb.auth.getSession();
+ if(session)showApp(session.user);else showAuth();
+ sb.auth.onAuthStateChange((_event,session)=>session?showApp(session.user):showAuth());
+}
+async function auth(action){
+ if(!configured)return;
+ const email=$("authEmail").value.trim(),password=$("authPassword").value;
+ if(!email||!password)return $("authMsg").textContent="Введите email и пароль.";
+ $("authMsg").textContent="Загрузка...";
+ const res=action==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+ if(res.error)$("authMsg").textContent=res.error.message;
+ else $("authMsg").textContent=action==="login"?"Выполнено.":"Аккаунт создан. Если включено подтверждение email — подтверди адрес.";
+}
+function openDetails(id){
+ const a=anime.find(x=>String(x.id)===String(id));if(!a)return;
+ const poster=a.poster_url?`<img class="poster" src="${esc(a.poster_url)}" onerror="this.style.display='none'">`:"";
+ $("details").innerHTML=`${poster}<div class="info"><h2>${esc(a.title)}</h2>
+ <div class="row"><span class="label">Год:</span><br>${esc(a.year||"—")}</div>
+ <div class="row"><span class="label">Озвучка:</span><br>${esc(a.voice||"—")}</div>
+ <div class="row"><span class="label">Описание:</span><br><span class="description">${esc(a.description||"—")}</span></div>
+ <div class="row"><span class="label">Статусы:</span><div class="statuses">${chips(a.statuses||[])}</div></div>
+ <div class="actions"><button class="btn" onclick="editAnime('${a.id}')">Изменить</button><button class="btn danger" onclick="deleteAnime('${a.id}')">Удалить</button></div></div>`;
+ $("detailsBg").classList.add("show");
+}
+function openForm(a=null){
+ editingId=a?.id||null;selectedStatuses=new Set(a?.statuses||[]);selectedPosterFile=null;removePoster=false;
+ $("formTitle").textContent=a?"Изменить аниме":"Добавить аниме";
+ $("fTitle").value=a?.title||"";$("fYear").value=a?.year||"";$("fVoice").value=a?.voice||"";$("fDesc").value=a?.description||"";
+ $("fPosterFile").value="";$("previewMini").style.display="none";
+ $("removePosterBtn").classList.toggle("hidden",!a?.poster_url);
+ $("posterPreview").innerHTML=a?.poster_url?"Текущий постер сохранён.<br>Выбери новый файл, чтобы заменить его, или нажми «Удалить постер».":"Можно выбрать изображение прямо с телефона.";
+ $("statusGrid").innerHTML=chips([...selectedStatuses],true);
+ $("statusGrid").querySelectorAll("[data-status]").forEach(b=>b.onclick=()=>{const s=b.dataset.status;selectedStatuses.has(s)?selectedStatuses.delete(s):selectedStatuses.add(s);b.classList.toggle("on");});
+ $("formBg").classList.add("show");
+}
+window.editAnime=id=>{const a=anime.find(x=>String(x.id)===String(id));$("detailsBg").classList.remove("show");openForm(a)};
+async function removeStorageFile(url){
+ if(!url||!sb)return;
+ const marker="/storage/v1/object/public/anime-posters/";
+ const pos=url.indexOf(marker);if(pos===-1)return;
+ const path=decodeURIComponent(url.slice(pos+marker.length).split("?")[0]);
+ const r=await sb.storage.from("anime-posters").remove([path]);
+ if(r.error)console.warn("Не удалось удалить файл:",r.error.message);
+}
+window.deleteAnime=async id=>{
+ if(!confirm("Удалить это аниме и его постер?"))return;
+ const a=anime.find(x=>String(x.id)===String(id));
+ if(ready()){const r=await sb.from("anime").delete().eq("id",id);if(r.error)return alert(r.error.message);await removeStorageFile(a?.poster_url)}
+ anime=anime.filter(x=>String(x.id)!==String(id));$("detailsBg").classList.remove("show");render();
+};
+function ready(){return !!(sb&&currentUser)}
+$("fPosterFile").onchange=()=>{
+ selectedPosterFile=$("fPosterFile").files[0]||null;
+ if(selectedPosterFile){removePoster=false;$("removePosterBtn").classList.add("hidden");$("previewMini").src=URL.createObjectURL(selectedPosterFile);$("previewMini").style.display="block";$("posterPreview").textContent=`Выбран новый файл: ${selectedPosterFile.name}`;}
+};
+$("removePosterBtn").onclick=()=>{selectedPosterFile=null;removePoster=true;$("fPosterFile").value="";$("previewMini").style.display="none";$("posterPreview").textContent="Постер будет удалён после сохранения.";};
+$("saveAnime").onclick=async()=>{
+ const title=$("fTitle").value.trim();if(!title)return alert("Введите название.");
+ const current=editingId?anime.find(x=>String(x.id)===String(editingId)):null;
+ let posterUrl=current?.poster_url||"";
+ if(removePoster){posterUrl="";}
+ if(selectedPosterFile){
+  if(!ready())return alert("Нет подключения к Supabase.");
+  const ext=(selectedPosterFile.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+  const path=`posters/${crypto.randomUUID()}.${ext}`;
+  const upload=await sb.storage.from("anime-posters").upload(path,selectedPosterFile,{upsert:false,contentType:selectedPosterFile.type||"image/jpeg"});
+  if(upload.error)return alert("Не удалось загрузить постер: "+upload.error.message);
+  posterUrl=sb.storage.from("anime-posters").getPublicUrl(path).data.publicUrl;
+ }
+ const payload={title,year:$("fYear").value?Number($("fYear").value):null,voice:$("fVoice").value.trim(),poster_url:posterUrl,description:$("fDesc").value.trim(),statuses:[...selectedStatuses]};
+ if(ready()){
+  const r=editingId?await sb.from("anime").update(payload).eq("id",editingId).select().single():await sb.from("anime").insert(payload).select().single();
+  if(r.error)return alert(r.error.message);
+  if(current?.poster_url && current.poster_url!==posterUrl)await removeStorageFile(current.poster_url);
+  if(editingId)anime=anime.map(x=>String(x.id)===String(editingId)?r.data:x);else anime.unshift(r.data);
+ }else{
+  const local={id:crypto.randomUUID(),...payload,created_at:new Date().toISOString()};
+  editingId?anime=anime.map(x=>x.id===editingId?local:x):anime.unshift(local);
+ }
+ $("formBg").classList.remove("show");render();
+};
+$("loginBtn").onclick=()=>auth("login");$("signupBtn").onclick=()=>auth("signup");
+$("logoutBtn").onclick=async()=>{if(sb)await sb.auth.signOut()};
+$("search").oninput=render;$("addBtn").onclick=()=>openForm();
+$("cancelForm").onclick=()=>$("formBg").classList.remove("show");$("formClose").onclick=()=>$("formBg").classList.remove("show");$("detailsClose").onclick=()=>$("detailsBg").classList.remove("show");
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(b.dataset.page).classList.add("active");render()});
+boot();
+</script>
+</body>
+</html>
